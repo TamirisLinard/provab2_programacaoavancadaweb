@@ -1,18 +1,20 @@
 {
   "extends": "expo/tsconfig.base",
-  "esModuleInterop": true,
   "compilerOptions": {
+    "esModuleInterop": true,
     "strict": true,
+    "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["./*"]
+    },
+    "allowJs": true, 
+    "skipLibCheck": true
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+  ],
+  "exclude": ["node_modules", "build"]
 }
