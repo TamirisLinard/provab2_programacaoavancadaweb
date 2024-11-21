@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View, ActivityIndicator, FlatList } from 'reac
 import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'expo-router';
 import { getData } from '../storage';
-import '../App.css'; 
+import '../App.css';
 import { AuthContext } from '../authcontext';
 
 interface Post {
@@ -23,13 +23,16 @@ export default function HomeScreen() {
   const router = useRouter();
   const [data, setData] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
-  const token = getData();
-    console.log(token)
-    if(!token){
+  // Verificação do token dentro do useEffect
+  useEffect(() => {
+    const token = getData();
+    console.log(token);
+    if (!token) {
       router.replace('/login');
     }
+  }, [router]); // Dependência de 'router' para que a navegação ocorra após a verificação
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,8 +49,9 @@ export default function HomeScreen() {
     };
 
     fetchData();
-  }, []);
+  }, []); // Carregar dados apenas uma vez
 
+  // Exibição de ActivityIndicator enquanto os dados são carregados
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -59,6 +63,7 @@ export default function HomeScreen() {
           <div className="username">@{user?.email.split('@')[0]}</div>
         </div>
       </header>
+
       <div className="posts-list">
         {data.map((post) => (
           <div key={post.id} className="post-container">
