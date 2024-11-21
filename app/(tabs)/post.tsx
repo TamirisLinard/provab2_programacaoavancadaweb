@@ -12,92 +12,93 @@ interface Post {
 }
 
 interface User {
-  id: number
+  id: number;
   name: string;
   email: string;
 }
 
 export default function NewPost() {
   const router = useRouter();
-  
-  const [userData, setuserData] = useState<User>({
-    id: 0,
-    name: '',
-    email: '',
-  });
+  const { user } = useContext(AuthContext); // User context to get user details
 
+  // State for post title and content
   const [postContent, setPostContent] = useState<string>('');
   const [postTitle, setPostTitle] = useState<string>('');
-  const {user} = useContext(AuthContext);
 
-  /*const [isMounted, setIsMounted] = useState(false);
-
+  // Effect for checking token and user status
   useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 100);
-    () => clearTimeout(timer);
+    const token = getData();
+    if (!token) {
+      router.replace('/login'); // Redirect to login if no token
+    }
+  }, [router]);
 
-    if (!user) {
-      router.replace("/login");
+  // Handle post submission
+  const handlePostSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!postTitle || !postContent) {
+      alert('Por favor, preencha todos os campos!');
       return;
     }
 
-  }, []); */
+    try {
+      const response = await fetch("http://localhost:3000/post/create", {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          title: postTitle,
+          content: postContent,
+          authorId: user?.id,
+        }),
+      });
 
-  const token = getData();
-    console.log(token)
-    if(!token){
-      router.replace('/login');
+      if (response.ok) {
+        alert('Postagem criada com sucesso!');
+        setPostTitle(''); // Clear title
+        setPostContent(''); // Clear content
+      } else {
+        console.error('Erro ao criar a postagem', response);
+        alert('Erro ao criar a postagem');
+      }
+    } catch (error) {
+      console.error('Erro ao enviar a postagem:', error);
+      alert('Erro ao enviar a postagem');
     }
+  };
 
+  return (
+    <div className="nova-postagem-container">
+      <div className="user-info">
+        <div className="username">@{user?.email.split('@')[0]}</div>
+      </div>
 
-  const handlePostSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log(postTitle);
-    console.log(postContent);
-    try{
-        const response = await fetch("http://localhost:3000/post/create", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              title: postTitle,
-              content: postContent,
-              authorId: user?.id
-            })
-        }) 
-        console.log(response);
-    }
-    catch(error){
-        console.log(error);
-    }
-};
-
-return (
-  <div className="nova-postagem-container">
-    <div className="user-info">
-      <div className="username">@{user?.email.split('@')[0]}</div>
-    </div>
-
-    <form className="post-form-container" onClick={handlePostSubmit}>
+      <form className="post-form-container" onSubmit={handlePostSubmit}>
         <div className="form-title">Criar Nova Postagem</div>
+
         <div className="post-input-container">
-        <input
-          type="text"
-          value={postTitle}
-          onChange={(e) => setPostTitle(e.target.value)}
-          placeholder="Título da postagem"
-          className="post-title-input"
-        />
+          <input
+            type="text"
+            value={postTitle}
+            onChange={(e) => setPostTitle(e.target.value)}
+            placeholder="Título da postagem"
+            className="post-title-input"
+            required
+          />
+
           <textarea
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
             placeholder="Escreva sua postagem aqui..."
             className="post-input"
+            required
           />
         </div>
-        <button className="publish-button">
+
+        <button type="submit" className="publish-button">
           Publicar
         </button>
       </form>
     </div>
-);
+  );
 }
