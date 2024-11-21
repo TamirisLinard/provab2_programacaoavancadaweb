@@ -8,7 +8,10 @@ const oldDirPath = path.join(root, 'app');
 const newDirPath = path.join(root, 'app-example');
 const newAppDirPath = path.join(root, 'app');
 
-const indexContent = `import { Text, View } from "react-native";
+const filesToCreate = [
+  {
+    path: path.join(newAppDirPath, 'index.tsx'),
+    content: `import { Text, View } from "react-native";
 
 export default function Index() {
   return (
@@ -23,9 +26,11 @@ export default function Index() {
     </View>
   );
 }
-`;
-
-const layoutContent = `import { Stack } from "expo-router";
+`,
+  },
+  {
+    path: path.join(newAppDirPath, '_layout.tsx'),
+    content: `import { Stack } from "expo-router";
 
 export default function RootLayout() {
   return (
@@ -34,34 +39,66 @@ export default function RootLayout() {
     </Stack>
   );
 }
-`;
+`,
+  },
+];
 
-fs.rename(oldDirPath, newDirPath, (error) => {
-  if (error) {
-    return console.error(`Error renaming directory: ${error}`);
-  }
-  console.log('/app moved to /app-example.');
-
-  fs.mkdir(newAppDirPath, { recursive: true }, (error) => {
-    if (error) {
-      return console.error(`Error creating new app directory: ${error}`);
-    }
-    console.log('New /app directory created.');
-
-    const indexPath = path.join(newAppDirPath, 'index.tsx');
-    fs.writeFile(indexPath, indexContent, (error) => {
+// Função para mover o diretório
+function renameDirectory(oldPath, newPath) {
+  return new Promise((resolve, reject) => {
+    fs.rename(oldPath, newPath, (error) => {
       if (error) {
-        return console.error(`Error creating index.tsx: ${error}`);
+        reject(`Error renaming directory: ${error}`);
+      } else {
+        console.log(`${oldPath} moved to ${newPath}.`);
+        resolve();
       }
-      console.log('app/index.tsx created.');
-
-      const layoutPath = path.join(newAppDirPath, '_layout.tsx');
-      fs.writeFile(layoutPath, layoutContent, (error) => {
-        if (error) {
-          return console.error(`Error creating _layout.tsx: ${error}`);
-        }
-        console.log('app/_layout.tsx created.');
-      });
     });
   });
-});
+}
+
+// Função para criar um novo diretório
+function createDirectory(dirPath) {
+  return new Promise((resolve, reject) => {
+    fs.mkdir(dirPath, { recursive: true }, (error) => {
+      if (error) {
+        reject(`Error creating directory: ${error}`);
+      } else {
+        console.log(`Directory created at: ${dirPath}`);
+        resolve();
+      }
+    });
+  });
+}
+
+// Função para criar um arquivo com conteúdo
+function createFile(filePath, content) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(filePath, content, (error) => {
+      if (error) {
+        reject(`Error creating file at ${filePath}: ${error}`);
+      } else {
+        console.log(`File created at: ${filePath}`);
+        resolve();
+      }
+    });
+  });
+}
+
+// Fluxo principal
+async function main() {
+  try {
+    await renameDirectory(oldDirPath, newDirPath);
+    await createDirectory(newAppDirPath);
+
+    for (const file of filesToCreate) {
+      await createFile(file.path, file.content);
+    }
+
+    console.log('All operations completed successfully.');
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+main();
