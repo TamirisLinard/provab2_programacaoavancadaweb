@@ -1,51 +1,55 @@
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
-import './App.css'; 
+import './App.css';
 import { getData, storeData } from '../storage';
 
 interface FormData {
   name: string;
   email: string;
-  passworld: string;
+  password: string;  // Corrigido de 'passworld' para 'password'
 }
 
 export default function SignUp() {
-
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
-    passworld: ''
+    password: '', // Corrigido aqui também
   });
 
+  // Função para lidar com a mudança nos campos do formulário
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
     }));
   };
 
+  // Função para lidar com o envio do formulário
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try{
-        const response = await fetch("http://localhost:3000/user/create", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(formData)
-        }) 
-        console.log(response)
+    try {
+      // Enviando dados para o servidor
+      const response = await fetch("http://localhost:3000/user/create", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-        const responseData = await response.json();
-        if (response.ok) {
-          router.replace('/login');
-        }
+      if (response.ok) {
+        // Redirecionando para a página de login em caso de sucesso
+        router.replace('/login');
+      } else {
+        // Caso a resposta não seja ok, você pode lidar com o erro
+        console.log('Erro ao criar conta:', await response.json());
+      }
+    } catch (error) {
+      // Exibindo erro em caso de falha na requisição
+      console.error('Erro de conexão ou outro erro:', error);
     }
-    catch(error){
-        console.log(error)
-    }
-};
+  };
 
   return (
     <div className="container">
@@ -61,7 +65,7 @@ export default function SignUp() {
           value={formData.name} 
           onChange={handleChange} 
           placeholder="Nome de usuário" 
-          className="input"
+          className="input" 
           required 
         />
         <input 
@@ -70,16 +74,16 @@ export default function SignUp() {
           value={formData.email} 
           onChange={handleChange} 
           placeholder="E-mail" 
-          className="input"
+          className="input" 
           required 
         />
         <input 
           type="password" 
-          name="passworld" 
-          value={formData.passworld} 
+          name="password" // Corrigido para 'password'
+          value={formData.password} // Corrigido para 'password'
           onChange={handleChange} 
           placeholder="Senha" 
-          className="input"
+          className="input" 
           required 
         />
         <button type="submit" className="submit-button">Cadastrar</button>
