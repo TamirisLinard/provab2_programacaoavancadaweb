@@ -2,22 +2,15 @@
 
 exports[`renders correctly 1`] = `
 <Text
-  style={
-    [
-      {
-        "color": "#11181C",
-      },
-      {
-        "fontSize": 16,
-        "lineHeight": 24,
-      },
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-    ]
-  }
+  style={[
+    {
+      color: "#11181C",  // Cor do texto
+    },
+    {
+      fontSize: 16,       // Tamanho da fonte
+      lineHeight: 24,     // Altura da linha
+    },
+  ]}
 >
   Snapshot test!
 </Text>
