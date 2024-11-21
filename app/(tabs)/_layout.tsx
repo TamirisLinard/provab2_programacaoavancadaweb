@@ -1,32 +1,33 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { Ionicons } from '@expo/vector-icons'; // Biblioteca de ícones
-import '../App.css'; 
-
+import '../App.css';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme(); // Obtém o esquema de cores atual, 'light' ou 'dark'
 
+  // Define a cor ativa do ícone com base no esquema de cores
+  const activeTintColor = Colors[colorScheme ?? 'light'].tint;
+  
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarInactiveTintColor: '#8a8a8a',
+        tabBarActiveTintColor: activeTintColor,  // Cor do ícone ativo
+        tabBarInactiveTintColor: '#8a8a8a',     // Cor do ícone inativo
         tabBarStyle: {
-          backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#ffffff',
+          backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#ffffff', // Cor de fundo do tabBar
           borderTopWidth: 1,
           borderTopColor: '#dcdcdc',
-          height: 70,
+          height: 70,  // Altura do tabBar
           paddingBottom: 10,
         },
         tabBarLabelStyle: {
-          fontFamily: 'Poppins',
-          fontSize: 12,
+          fontFamily: 'Poppins',  // Fonte para as labels dos ícones
+          fontSize: 12,  // Tamanho da fonte
         },
-        headerShown: false,
+        headerShown: false,  // Esconde o cabeçalho
       }}
     >
       <Tabs.Screen
